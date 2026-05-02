@@ -47,6 +47,11 @@ const upload = multer({ storage });
 app.post("/auth/register", upload.single("picture"), register);
 app.post("/posts", verifyToken, upload.single("picture"), createPost);
 
+// Root Route
+app.get("/", (req, res) => {
+  res.send("Social Media API is running...");
+});
+
 /* ROUTES */
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
@@ -63,7 +68,18 @@ mongoose
     app.listen(PORT, () => console.log(`Server Port: ${PORT}`));
 
     /* ADD DATA ONE TIME */
-    // User.insertMany(users);
-    // Post.insertMany(posts);
+    const seedData = async () => {
+      const userCount = await User.countDocuments();
+      if (userCount === 0) {
+        await User.insertMany(users);
+        console.log("Users seeded");
+      }
+      const postCount = await Post.countDocuments();
+      if (postCount === 0) {
+        await Post.insertMany(posts);
+        console.log("Posts seeded");
+      }
+    };
+    seedData();
   })
   .catch((error) => console.log(`${error} did not connect`));
